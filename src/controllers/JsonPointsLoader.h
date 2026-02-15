@@ -13,6 +13,8 @@
 #include "TrackController.h"
 #include "geometry/utils.h"
 
+static constexpr int DegreeDirectionChangeThreshold = 30;
+
 class JsonPointsLoader : public QObject {
     Q_OBJECT
 public:
@@ -39,8 +41,7 @@ public:
         }
 
         QJsonArray points = doc.array();
-        int n = points.size();
-        if (n < 2) {
+        if (points.size() < 2) {
             qWarning() << "JsonPointsLoader: need at least 2 points";
             return;
         }
@@ -52,8 +53,8 @@ public:
         };
         QVector<DayGroup> dayGroups;
 
-        for (int i = 0; i < n; ++i) {
-            auto obj = points[i].toObject();
+        for (const auto& point : points) {
+            auto obj = point.toObject();
             QString date = obj[QStringLiteral("dateAsString")].toString();
 
             if (dayGroups.isEmpty() || dayGroups.last().date != date) {
@@ -63,13 +64,13 @@ public:
         }
 
         static const QColor palette[] = {
-            QColor("#ff6b6b"), QColor("#4ecdc4"), QColor("#ffe66d"), QColor("#a8e6cf"),
-            QColor("#ff8b94"), QColor("#6c5ce7"), QColor("#fd79a8"), QColor("#00cec9"),
-            QColor("#fab1a0"), QColor("#74b9ff"), QColor("#55efc4"), QColor("#ffeaa7"),
-            QColor("#dfe6e9"), QColor("#b2bec3"), QColor("#e17055"), QColor("#0984e3")
+            QColor(0xff6b6b), QColor(0x4ecdc4), QColor(0xffe66d), QColor(0xa8e6cf),
+            QColor(0xff8b94), QColor(0x6c5ce7), QColor(0xfd79a8), QColor(0x00cec9),
+            QColor(0xfab1a0), QColor(0x74b9ff), QColor(0x55efc4), QColor(0xffeaa7),
+            QColor(0xdfe6e9), QColor(0xb2bec3), QColor(0xe17055), QColor(0x0984e3)
         };
         static constexpr int paletteSize = 16;
-        static constexpr float DirectionChangeThreshold = 0.52f; // ~30 degrees in radians
+        static constexpr float DirectionChangeThreshold = qDegreesToRadians(DegreeDirectionChangeThreshold);
 
         int trackCount = 0;
 
@@ -140,7 +141,7 @@ public:
         }
 
         qDebug() << "JsonPointsLoader: created" << trackCount << "tracks from"
-                 << n << "points across" << dayGroups.size() << "day groups";
+                 << points.size() << "points across" << dayGroups.size() << "day groups";
     }
 
 private:

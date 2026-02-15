@@ -1,6 +1,5 @@
 import QtQuick
 import QtQuick3D
-import QtQuick3D.Helpers
 import "components"
 
 Window {
@@ -21,8 +20,6 @@ Window {
         environment: SceneEnvironment {
             clearColor: "#1e1e2e"
             backgroundMode: SceneEnvironment.Color
-            antialiasingMode: SceneEnvironment.MSAA
-            antialiasingQuality: SceneEnvironment.High
         }
 
         Node {
@@ -44,34 +41,21 @@ Window {
             eulerRotation.y: 30
         }
 
-        Texture {
-            id: earthTexture
-            source: "qrc:/assets/textures/earth.jpg"
-        }
-
-        SphereGeometry {
-            id: earthGeometry
-            radius: 0.5
-            rings: 64
-            segments: 512
-        }
-
         Model {
             id: earth
-            geometry: earthGeometry
-            eulerRotation.y: 90
-
-            scale: Qt.vector3d(1, 1, 1)
+            source: "#Sphere"
+            position: Qt.vector3d(0, 0, 0)
+            // For some reason - when set to 0.01, the sphere is very slightly too small!!
+            scale: Qt.vector3d(0.010110, 0.010110, 0.010110)
 
             materials: [
-                PrincipledMaterial {
-                    baseColorMap: earthTexture
-                    roughness: 0.7
-                    metalness: 0.05
+                DefaultMaterial {
+                    diffuseMap: Texture {
+                        source: "qrc:/assets/textures/earth.jpg"
+                    }
                 }
             ]
         }
-
     }
 
     // Made a MouseArea to capture scroll events
@@ -125,7 +109,7 @@ Window {
         }
     }
 
-    ArcPanel {
+    MainPanel {
         anchors.top: parent.top
         anchors.right: parent.right
         anchors.margins: 16

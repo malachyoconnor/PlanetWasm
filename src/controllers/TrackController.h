@@ -7,6 +7,7 @@
 #include <QQuick3DObject>
 #include <QVariantList>
 #include <QColor>
+#include "geometry/trackgeometry.h"
 
 static void addTrack(QQmlEngine *engine, QObject *sceneRoot,
                      const QVariantList &points, const QColor &color) {
@@ -27,18 +28,9 @@ static void addTrack(QQmlEngine *engine, QObject *sceneRoot,
     model->setParentItem(qobject_cast<QQuick3DObject *>(sceneRoot));
 
     // Set points on the TrackGeometry child
-    auto *geom = model->findChild<QObject *>();
-    if (geom && geom->metaObject()->className() == QStringLiteral("TrackGeometry")) {
+    auto *geom = model->findChild<TrackGeometry *>();
+    if (geom)
         geom->setProperty("points", points);
-    } else {
-        // Fallback: search by property name
-        for (auto *child : model->children()) {
-            if (child->property("points").isValid()) {
-                child->setProperty("points", points);
-                break;
-            }
-        }
-    }
 
     // Set the material color
     QQmlListReference materials(model, "materials");

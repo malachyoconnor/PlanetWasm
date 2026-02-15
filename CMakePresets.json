@@ -1,34 +1,59 @@
 {
-    "version": 6,
-    "configurePresets": [
-        {
-            "name": "native",
-            "displayName": "Native Desktop",
-            "binaryDir": "${sourceDir}/build-native",
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Debug"
-            }
-        },
-        {
-            "name": "wasm",
-            "displayName": "WebAssembly (Emscripten)",
-            "binaryDir": "${sourceDir}/build-wasm",
-            "toolchainFile": "/opt/qt6-wasm/lib/cmake/Qt6/qt.toolchain.cmake",
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Release",
-                "Qt6_DIR": "/opt/qt6-wasm/lib/cmake/Qt6",
-                "QT_HOST_PATH": "/usr"
-            }
-        }
-    ],
-    "buildPresets": [
-        {
-            "name": "native",
-            "configurePreset": "native"
-        },
-        {
-            "name": "wasm",
-            "configurePreset": "wasm"
-        }
-    ]
+  "version": 6,
+  "configurePresets": [
+    {
+      "name": "native",
+      "displayName": "Native Desktop",
+      "binaryDir": "${sourceDir}/build-native",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      },
+      "environment": {
+        "EMSDK": "/home/mali/Packages/emsdk"
+      }
+    },
+    {
+      "name": "wasm",
+      "displayName": "WebAssembly (Emscripten)",
+      "binaryDir": "${sourceDir}/build-wasm",
+      "toolchainFile": "/opt/qt6-wasm/lib/cmake/Qt6/qt.toolchain.cmake",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "MinSizeRel",
+        "Qt6_DIR": "/opt/qt6-wasm/lib/cmake/Qt6",
+        "QT_HOST_PATH": "/usr"
+      },
+      "environment": {
+        "EMSDK": "/home/mali/Packages/emsdk"
+      }
+    },
+    {
+      "name": "wasm-debug",
+      "displayName": "WebAssembly (Emscripten)",
+      "binaryDir": "${sourceDir}/build-wasm-debug",
+      "toolchainFile": "/opt/qt6-wasm/lib/cmake/Qt6/qt.toolchain.cmake",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "Qt6_DIR": "/opt/qt6-wasm/lib/cmake/Qt6",
+        "QT_HOST_PATH": "/usr"
+      },
+      "environment": {
+        "EMSDK": "/home/mali/Packages/emsdk"
+      }
+    }
+  ],
+
+  "buildPresets": [
+    {
+      "name": "native",
+      "configurePreset": "native"
+    },
+    {
+      "name": "wasm",
+      "configurePreset": "wasm"
+    },
+    {
+      "name": "wasm-debug",
+      "configurePreset": "wasm-debug"
+    }
+  ]
 }

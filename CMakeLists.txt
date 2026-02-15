@@ -15,6 +15,10 @@ qt_add_executable(PlanetWasm
     src/controllers/ArcBridge.h
     src/controllers/JsonPointsLoader.h
     src/controllers/TrackController.h
+    src/geometry/straightline.h
+    src/geometry/straightline.cpp
+    src/controllers/LineController.h
+    src/controllers/LineBridge.h
 )
 
 target_include_directories(PlanetWasm PRIVATE src src/geometry)
@@ -25,9 +29,15 @@ qt_add_qml_module(PlanetWasm
     QML_FILES
         qml/main.qml
         qml/components/arc.qml
+        qml/components/line.qml
         qml/components/track.qml
-        qml/components/ArcPanel.qml
-    RESOURCES assets/textures/earth.jpg
+        qml/components/MainPanel.qml
+        qml/components/AddArcPanel.qml
+        qml/components/AddLinePanel.qml
+        qml/components/PointImportPanel.qml
+    RESOURCES
+        assets/textures/earth.jpg
+        assets/textures/earth_original.jpg
     NO_RESOURCE_TARGET_PATH
 )
 

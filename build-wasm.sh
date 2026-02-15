@@ -31,9 +31,9 @@ check_environment() {
 
 check_environment
 
-echo "Building WASM project..."
-cmake --preset wasm
-cmake --build --preset wasm --parallel
+echo "Building WASM project (debug)..."
+cmake --preset wasm-debug
+cmake --build --preset wasm-debug --parallel
 
 echo -e "\nBuild complete. Serve with:"
-echo "python3 -m http.server -d build-wasm/"
+echo "python3 serve-wasm.py"

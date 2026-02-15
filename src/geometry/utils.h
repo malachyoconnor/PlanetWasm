@@ -29,6 +29,10 @@ inline QVector3D interpolateSpherical(const QVector3D &origin, const QVector3D &
    return origin * weightOrigin + target * weightTarget;
 }
 
+inline QVector3D interpolateLinear(const QVector3D &origin, const QVector3D &target, float fraction) {
+   return origin + (target - origin) * fraction;
+}
+
 } // namespace geometry
 
 #endif // GEOMETRY_UTILS_H
