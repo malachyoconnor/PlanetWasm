@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick3D
+import "components"
 
 Window {
     width: 1280
@@ -52,12 +53,15 @@ Window {
             }
         }
 
-        WheelHandler {
-            target: null
-            onWheel: (event) => {
-                let z = camera.position.z - event.angleDelta.y * 0.1;
-                camera.position.z = Math.min(Math.max(z, 165), 800);
-            }
+    }
+
+    // Made a MouseArea to capture scroll events
+    MouseArea {
+        anchors.fill: parent
+        acceptedButtons: Qt.NoButton
+        onWheel: (wheel) => {
+            let z = camera.position.z - wheel.angleDelta.y * 0.1;
+            camera.position.z = Math.min(Math.max(z, 165), 800);
         }
 
         DragHandler {
@@ -79,5 +83,11 @@ Window {
                 }
             }
         }
+    }
+
+    ArcPanel {
+        anchors.top: parent.top
+        anchors.right: parent.right
+        anchors.margins: 16
     }
 }

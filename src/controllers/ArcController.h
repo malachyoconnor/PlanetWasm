@@ -1,5 +1,6 @@
 #ifndef PLANETWASM_ARCMANAGER_H
 #define PLANETWASM_ARCMANAGER_H
+#include <QQmlListReference>
 #include "geometry/arcgeometry.h"
 
 static void addArc(QQmlEngine *engine, QObject *sceneRoot,
@@ -30,11 +31,11 @@ static void addArc(QQmlEngine *engine, QObject *sceneRoot,
    }
 
    // Set the material color
-   auto materials = model->property("materials");
-   if (materials.isValid()) {
-      auto matList = materials.value<QList<QObject *> >();
-      if (!matList.isEmpty())
-         matList.first()->setProperty("baseColor", color);
+   QQmlListReference materials(model, "materials");
+   if (materials.count() > 0) {
+      materials.at(0)->setProperty("baseColor", color);
+   } else {
+      qDebug() << "No materials found for arc. Couldn't set colour";
    }
 }
 

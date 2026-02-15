@@ -11,6 +11,7 @@ qt_add_executable(PlanetWasm
     src/main.cpp
     src/geometry/arcgeometry.h
     src/geometry/arcgeometry.cpp
+    src/controllers/ArcBridge.h
 )
 
 target_include_directories(PlanetWasm PRIVATE src src/geometry)
@@ -21,6 +22,7 @@ qt_add_qml_module(PlanetWasm
     QML_FILES
         qml/main.qml
         qml/components/arc.qml
+        qml/components/ArcPanel.qml
     RESOURCES assets/textures/earth.jpg
     NO_RESOURCE_TARGET_PATH
 )
