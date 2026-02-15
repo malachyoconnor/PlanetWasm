@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick3D
+import QtQuick3D.Helpers
 import "components"
 
 Window {
@@ -12,6 +13,7 @@ Window {
         Node {
             id: sceneRoot
             objectName: "sceneRoot"
+            property real cameraZ: camera.position.z
         }
 
         anchors.fill: parent
@@ -25,15 +27,19 @@ Window {
 
         Node {
             id: cameraOrbit
+            eulerRotation.x: -54
+            eulerRotation.y: 2
             PerspectiveCamera {
                 id: camera
-                position: Qt.vector3d(0, 0, 300)
+                clipNear: 0.0001
+                clipFar: 100
+                position: Qt.vector3d(0, 0, 1)
             }
         }
 
         DirectionalLight {
             id: light
-            position: Qt.vector3d(0, 0, 200)
+            position: Qt.vector3d(0, 0, 0.67)
             eulerRotation.x: -30
             eulerRotation.y: 30
         }
@@ -43,14 +49,27 @@ Window {
             source: "qrc:/assets/textures/earth.jpg"
         }
 
+        SphereGeometry {
+            id: earthGeometry
+            radius: 0.5
+            rings: 64
+            segments: 512
+        }
+
         Model {
-            source: "#Sphere"
-            scale: Qt.vector3d(3, 3, 3)
-            materials: PrincipledMaterial {
-                baseColorMap: earthTexture
-                roughness: 0.7
-                metalness: 0.05
-            }
+            id: earth
+            geometry: earthGeometry
+            eulerRotation.y: 90
+
+            scale: Qt.vector3d(1, 1, 1)
+
+            materials: [
+                PrincipledMaterial {
+                    baseColorMap: earthTexture
+                    roughness: 0.7
+                    metalness: 0.05
+                }
+            ]
         }
 
     }
@@ -60,8 +79,9 @@ Window {
         anchors.fill: parent
         acceptedButtons: Qt.NoButton
         onWheel: (wheel) => {
-            let z = camera.position.z - wheel.angleDelta.y * 0.1;
-            camera.position.z = Math.min(Math.max(z, 165), 800);
+            let zoomSpeed = 0.00033 * (camera.position.z - 0.5) / 0.5;
+            let z = camera.position.z - wheel.angleDelta.y * zoomSpeed;
+            camera.position.z = Math.min(Math.max(z, 0.502), 2.67);
         }
 
         DragHandler {
@@ -73,12 +93,32 @@ Window {
             }
             onCentroidChanged: {
                 if (active) {
+                    let speed = 0.3 * (camera.position.z - 0.5) / 0.5;
                     let dx = centroid.position.x - lastPos.x;
                     let dy = centroid.position.y - lastPos.y;
-                    cameraOrbit.eulerRotation.y -= dx * 0.3;
-                    cameraOrbit.eulerRotation.x -= dy * 0.3;
-                    light.eulerRotation.y -= dx * 0.3;
-                    light.eulerRotation.x -= dy * 0.3;
+                    cameraOrbit.eulerRotation.y -= dx * speed;
+                    cameraOrbit.eulerRotation.x -= dy * speed;
+                    light.eulerRotation.y -= dx * speed;
+                    light.eulerRotation.x -= dy * speed;
+                    lastPos = centroid.position;
+                }
+            }
+        }
+
+        DragHandler {
+            target: null
+            acceptedButtons: Qt.RightButton
+            property point lastPos
+            onActiveChanged: {
+                if (active)
+                    lastPos = centroid.position;
+            }
+            onCentroidChanged: {
+                if (active) {
+                    let dx = centroid.position.x - lastPos.x;
+                    let dy = centroid.position.y - lastPos.y;
+                    camera.eulerRotation.y -= dx * 0.3;
+                    camera.eulerRotation.x -= dy * 0.3;
                     lastPos = centroid.position;
                 }
             }

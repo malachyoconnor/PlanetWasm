@@ -4,7 +4,7 @@
 #include "geometry/arcgeometry.h"
 
 static void addArc(QQmlEngine *engine, QObject *sceneRoot,
-                   float lat1, float lon1, float lat2, float lon2,
+                   double lat1, double lon1, double lat2, double lon2,
                    const QColor &color) {
    QQmlComponent component(engine, QUrl(QStringLiteral("qrc:/qml/components/arc.qml")));
 

@@ -12,7 +12,7 @@ public:
     explicit ArcBridge(QQmlEngine *engine, QObject *sceneRoot, QObject *parent = nullptr)
         : QObject(parent), m_engine(engine), m_sceneRoot(sceneRoot) {}
 
-    Q_INVOKABLE void addArcFromUI(float lat1, float lon1, float lat2, float lon2, const QString &color) {
+    Q_INVOKABLE void addArcFromUI(double lat1, double lon1, double lat2, double lon2, const QString &color) {
         addArc(m_engine, m_sceneRoot, lat1, lon1, lat2, lon2, QColor(color));
     }
 

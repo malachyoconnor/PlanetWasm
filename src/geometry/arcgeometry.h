@@ -3,15 +3,17 @@
 
 #include <QQuick3DGeometry>
 #include <QQmlEngine>
+#include <QTimer>
 
 class ArcGeometry : public QQuick3DGeometry {
     Q_OBJECT
     QML_ELEMENT
 
-    Q_PROPERTY(float startLatitude MEMBER m_startLat NOTIFY changed)
-    Q_PROPERTY(float startLongitude MEMBER m_startLon NOTIFY changed)
-    Q_PROPERTY(float endLatitude MEMBER m_endLat NOTIFY changed)
-    Q_PROPERTY(float endLongitude MEMBER m_endLon NOTIFY changed)
+    Q_PROPERTY(double startLatitude MEMBER m_startLat NOTIFY changed)
+    Q_PROPERTY(double startLongitude MEMBER m_startLon NOTIFY changed)
+    Q_PROPERTY(double endLatitude MEMBER m_endLat NOTIFY changed)
+    Q_PROPERTY(double endLongitude MEMBER m_endLon NOTIFY changed)
+    Q_PROPERTY(float cameraZ MEMBER m_cameraZ NOTIFY changed)
 
 public:
     explicit ArcGeometry(QQuick3DObject *parent = nullptr);
@@ -22,8 +24,10 @@ signals:
 private:
     void rebuild();
 
-    float m_startLat = 0, m_startLon = 0;
-    float m_endLat = 0, m_endLon = 0;
+    QTimer m_rebuildTimer;
+    double m_startLat = 0, m_startLon = 0;
+    double m_endLat = 0, m_endLon = 0;
+    float m_cameraZ = 1.0f;
 };
 
 #endif

@@ -6,10 +6,12 @@
 
 namespace geometry {
 
-inline QVector3D toCartesian(float latDeg, float lonDeg) {
-    float lat = qDegreesToRadians(latDeg);
-    float lon = qDegreesToRadians(lonDeg);
-    return {std::cos(lat) * std::sin(lon), std::sin(lat), std::cos(lat) * std::cos(lon)};
+inline QVector3D toCartesian(double latDeg, double lonDeg) {
+    double lat = qDegreesToRadians(latDeg);
+    double lon = qDegreesToRadians(lonDeg);
+    return {static_cast<float>(std::cos(lat) * std::sin(lon)),
+            static_cast<float>(std::sin(lat)),
+            static_cast<float>(std::cos(lat) * std::cos(lon))};
 }
 
 inline QVector3D interpolateSpherical(const QVector3D &origin, const QVector3D &target, float fraction) {
