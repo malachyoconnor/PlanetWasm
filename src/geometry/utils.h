@@ -33,6 +33,12 @@ inline QVector3D interpolateLinear(const QVector3D &origin, const QVector3D &tar
    return origin + (target - origin) * fraction;
 }
 
+inline float arcLengthToMiles(float arcLength) {
+    static constexpr float SphereRadius = 0.5f;
+    static constexpr float EarthRadiusMiles = 3958.8f;
+    return (arcLength / SphereRadius) * EarthRadiusMiles;
+}
+
 } // namespace geometry
 
 #endif // GEOMETRY_UTILS_H

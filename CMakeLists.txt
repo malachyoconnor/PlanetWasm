@@ -37,9 +37,30 @@ qt_add_qml_module(PlanetWasm
         qml/components/PointImportPanel.qml
     RESOURCES
         assets/textures/earth.jpg
-        assets/textures/earth_original.jpg
     NO_RESOURCE_TARGET_PATH
 )
+
+# Post-build: run wasm-opt on release builds
+if(CMAKE_BUILD_TYPE STREQUAL "MinSizeRel" OR CMAKE_BUILD_TYPE STREQUAL "Release")
+    find_program(WASM_OPT wasm-opt)
+    if(WASM_OPT)
+        add_custom_command(TARGET PlanetWasm POST_BUILD
+            COMMAND ${WASM_OPT} -Oz
+                --enable-bulk-memory
+                --enable-nontrapping-float-to-int
+                --duplicate-function-elimination
+                --merge-similar-functions
+                --strip-producers
+                --strip-debug
+                --vacuum
+                "$<TARGET_FILE_DIR:PlanetWasm>/PlanetWasm.wasm"
+                -o "$<TARGET_FILE_DIR:PlanetWasm>/PlanetWasm.wasm"
+            COMMENT "Running wasm-opt -Oz on PlanetWasm.wasm"
+        )
+    else()
+        message(WARNING "wasm-opt not found, skipping WASM optimization")
+    endif()
+endif()
 
 target_link_libraries(PlanetWasm PRIVATE
     Qt6::Core

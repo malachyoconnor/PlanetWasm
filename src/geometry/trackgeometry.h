@@ -14,7 +14,6 @@ class TrackGeometry : public QQuick3DGeometry {
     QML_ELEMENT
 
     Q_PROPERTY(QVariantList points READ points WRITE setPoints NOTIFY pointsChanged)
-    Q_PROPERTY(float cameraZ READ cameraZ WRITE setCameraZ NOTIFY cameraZChanged)
 
 public:
     explicit TrackGeometry(QQuick3DObject *parent = nullptr)
@@ -23,15 +22,6 @@ public:
         m_rebuildTimer.setInterval(50);
         connect(&m_rebuildTimer, &QTimer::timeout, this, &TrackGeometry::rebuild);
         connect(this, &TrackGeometry::pointsChanged, &m_rebuildTimer, qOverload<>(&QTimer::start));
-        connect(this, &TrackGeometry::cameraZChanged, &m_rebuildTimer, qOverload<>(&QTimer::start));
-    }
-
-    float cameraZ() const { return m_cameraZ; }
-    void setCameraZ(float z) {
-        if (m_cameraZ != z) {
-            m_cameraZ = z;
-            emit cameraZChanged();
-        }
     }
 
     QVariantList points() const { return m_points; }
@@ -42,17 +32,13 @@ public:
 
 signals:
     void pointsChanged();
-    void cameraZChanged();
 
 private:
     static constexpr float SphereRadius = 0.5f;
     static constexpr float BaseOffset = 0.001f;
-    static constexpr float TrackLineWidth = 0.0003f;
     static constexpr float SubdivisionThreshold = 0.02f;
 
     void rebuild() {
-        clear();
-
         // Parse points to cartesian, deduplicating near-coincident ones
         struct CartPoint { QVector3D pos; };
         QVector<CartPoint> cartPoints;
@@ -73,6 +59,7 @@ private:
         }
 
         if (cartPoints.size() < 2) {
+            clear();
             update();
             return;
         }
@@ -119,15 +106,29 @@ private:
         }
 
         // Build triangle strip
+        clear();
+
         const int totalVertices = path.size() * 2;
         const int stride = 3 * sizeof(float);
         QByteArray vertexBuffer(totalVertices * stride, Qt::Uninitialized);
         auto *writer = reinterpret_cast<float *>(vertexBuffer.data());
 
-        float halfWidth = TrackLineWidth * 0.5f;
-        float zoomScale = std::max(0.004f, (m_cameraZ - 0.5f) / 0.5f);
-        halfWidth *= zoomScale;
+        // Compute total arc length on sphere for length-dependent width
+        float totalLength = 0.0f;
+        for (int i = 1; i < path.size(); ++i)
+            totalLength += (path[i] - path[i - 1]).length();
+
+        // Width as a fraction of track length, clamped to reasonable bounds
+        static constexpr float WidthFraction = 0.03f;    // 3% of track length
+        static constexpr float MinLineWidth  = 0.000001f;
+        static constexpr float MaxLineWidth  = 0.0006f;
+        float halfWidth = std::clamp(totalLength * WidthFraction, MinLineWidth, MaxLineWidth) * 0.5f;
         float radius = SphereRadius + BaseOffset;
+
+       // If we're on the order of a city
+       if (geometry::arcLengthToMiles(totalLength) <= 15.0f) {
+         halfWidth = MinLineWidth;
+       }
 
         QVector3D minBound(std::numeric_limits<float>::max(),
                            std::numeric_limits<float>::max(),
@@ -173,7 +174,6 @@ private:
 
     QTimer m_rebuildTimer;
     QVariantList m_points;
-    float m_cameraZ = 1.0f;
 };
 
 #endif // TRACKGEOMETRY_H
