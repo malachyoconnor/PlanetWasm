@@ -1,2 +1,3 @@
 /build-native
-/build-wasm
+/build-wasm-debug
+/build-wasm-release

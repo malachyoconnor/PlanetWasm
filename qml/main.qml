@@ -114,4 +114,64 @@ Window {
         anchors.right: parent.right
         anchors.margins: 16
     }
+
+    Rectangle {
+        id: infoBox
+        x: 16
+        y: -height
+        width: 320
+        color: "#cc1e1e2e"
+        radius: 8
+        height: infoColumn.height + 24
+
+        Component.onCompleted: y = 16
+
+        Behavior on y {
+            NumberAnimation {
+                duration: 1000
+                easing.type: Easing.OutCubic
+            }
+        }
+
+        Column {
+            id: infoColumn
+            anchors.left: parent.left
+            anchors.right: closeButton.left
+            anchors.top: parent.top
+            anchors.margins: 13
+            spacing: 6
+
+            Text {
+                text: "PlanetWasm \u2708"
+                font.pixelSize: 18
+                font.bold: true
+                color: "#cdd6f4"
+            }
+
+            Text {
+                text: "Visualise your travel history on a 3D globe.\nDrag to orbit, right click to look around and scroll to zoom."
+                font.pixelSize: 16
+                color: "#a6adc8"
+                wrapMode: Text.WordWrap
+                width: parent.width
+            }
+        }
+
+        Text {
+            id: closeButton
+            anchors.top: parent.top
+            anchors.right: parent.right
+            anchors.margins: 8
+            text: "\u2715"
+            font.pixelSize: 14
+            color: "#a6adc8"
+
+            MouseArea {
+                anchors.fill: parent
+                anchors.margins: -4
+                cursorShape: Qt.PointingHandCursor
+                onClicked: infoBox.visible = false
+            }
+        }
+    }
 }
