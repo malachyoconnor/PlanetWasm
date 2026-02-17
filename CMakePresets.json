@@ -37,7 +37,7 @@
         "QT_HOST_PATH": "/usr",
         "CMAKE_CXX_FLAGS": "-Oz -flto",
         "CMAKE_C_FLAGS": "-Oz -flto",
-        "CMAKE_EXE_LINKER_FLAGS": "-Oz -flto --closure 1 -sEVAL_CTORS"
+        "CMAKE_EXE_LINKER_FLAGS": "-Oz -flto -sEVAL_CTORS"
       },
       "environment": {
         "EMSDK": "/home/mali/Packages/emsdk",

@@ -3,6 +3,7 @@
 
 #include <QVector3D>
 #include <QtMath>
+#include "constants.h"
 
 namespace geometry {
 
@@ -34,9 +35,7 @@ inline QVector3D interpolateLinear(const QVector3D &origin, const QVector3D &tar
 }
 
 inline float arcLengthToMiles(float arcLength) {
-    static constexpr float SphereRadius = 0.5f;
-    static constexpr float EarthRadiusMiles = 3958.8f;
-    return (arcLength / SphereRadius) * EarthRadiusMiles;
+    return (arcLength / constants::SphereRadius) * constants::EarthRadiusMiles;
 }
 
 } // namespace geometry

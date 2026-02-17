@@ -36,6 +36,7 @@ qt_add_qml_module(PlanetWasm
         qml/components/AddLinePanel.qml
         qml/components/PointImportPanel.qml
     RESOURCES
+        qml/shaders/arc.frag
         assets/textures/earth.jpg
         assets/examplePath1.json
         assets/examplePath2.json

@@ -1,7 +1,6 @@
 #include "straightline.h"
 #include "utils.h"
-
-static constexpr int Segments = 64;
+#include "constants.h"
 static constexpr float lineWidth = 0.2f;
 
 StraightLine::StraightLine(QQuick3DObject *parent) : QQuick3DGeometry(parent) {
@@ -12,7 +11,7 @@ StraightLine::StraightLine(QQuick3DObject *parent) : QQuick3DGeometry(parent) {
 void StraightLine::rebuild() {
    clear();
 
-   const int totalVertices = (Segments + 1) * 2;
+   const int totalVertices = (constants::Segments + 1) * 2;
    const int stride = 3 * sizeof(float);
 
    QByteArray vertexBuffer(totalVertices * stride, Qt::Uninitialized);
@@ -26,8 +25,8 @@ void StraightLine::rebuild() {
    QVector3D sideDir = QVector3D::crossProduct(forwardDir, up).normalized();
    QVector3D sideOffset = sideDir * (lineWidth * 0.5f);
 
-   for (int i = 0; i <= Segments; ++i) {
-      float progress = static_cast<float>(i) / Segments;
+   for (int i = 0; i <= constants::Segments; ++i) {
+      float progress = static_cast<float>(i) / constants::Segments;
       QVector3D pathPoint = geometry::interpolateLinear(m_start, m_end, progress);
 
       QVector3D leftEdge = pathPoint + sideOffset;

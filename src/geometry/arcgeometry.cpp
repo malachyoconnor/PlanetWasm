@@ -1,13 +1,12 @@
 #include "arcgeometry.h"
 #include "utils.h"
+#include "constants.h"
 #include <limits>
 
-static constexpr float SphereRadius = 0.5f;
-static constexpr float ArcHeightFactor = 0.033f;
-static constexpr int Segments = 64;
 static constexpr float LineWidthScale = 0.001f;
-static constexpr float MinLineWidth = 0.001f;
-static constexpr float MinArcHeight = 0.0f;
+static constexpr float MinLineWidth = 0.002f;
+static constexpr float MaxArcHeight = 0.01f;
+static constexpr float LateralOffset = 0.002f;
 
 ArcGeometry::ArcGeometry(QQuick3DObject *parent) : QQuick3DGeometry(parent) {
     m_rebuildTimer.setSingleShot(true);
@@ -26,19 +25,23 @@ void ArcGeometry::rebuild() {
    float cosTheta = std::clamp(QVector3D::dotProduct(startPoint, endPoint), -1.0f, 1.0f);
    float angleBetween = std::acos(cosTheta);
 
+   float distanceInMiles = constants::MilesPerDistance * (endPoint - startPoint).length();
+   // Clamp to between 300 and 600 km
+   float heightMultiplier = std::clamp(distanceInMiles, 300.0f , 600.0f) / 600.0f;
+   float peakHeight = heightMultiplier * MaxArcHeight;
+
    // Points too close together produce degenerate geometry — skip
    if (angleBetween < 0.01f) {
        update();
        return;
    }
 
-   float peakHeight = std::max(MinArcHeight, ArcHeightFactor * angleBetween);
    float lineWidth = std::max(MinLineWidth, LineWidthScale * angleBetween);
    float zoomScale = std::max(0.004f, (m_cameraZ - 0.5f) / 0.5f);
    lineWidth *= zoomScale;
 
-   const int totalVertices = (Segments + 1) * 2;
-   const int stride = 3 * sizeof(float);
+   const int totalVertices = (constants::Segments + 1) * 2;
+   const int stride = 5 * sizeof(float);
 
    QByteArray vertexBuffer(totalVertices * stride, Qt::Uninitialized);
    auto* vertexWriter = reinterpret_cast<float*>(vertexBuffer.data());
@@ -50,8 +53,8 @@ void ArcGeometry::rebuild() {
                       std::numeric_limits<float>::lowest(),
                       std::numeric_limits<float>::lowest());
 
-   for (int i = 0; i <= Segments; ++i) {
-      float progress = static_cast<float>(i) / Segments;
+   for (int i = 0; i <= constants::Segments; ++i) {
+      float progress = static_cast<float>(i) / constants::Segments;
       QVector3D pathPoint = geometry::interpolateSpherical(startPoint, endPoint, progress).normalized();
 
       float delta = 0.001f;
@@ -60,17 +63,21 @@ void ArcGeometry::rebuild() {
       QVector3D forwardDir = (geometry::interpolateSpherical(startPoint, endPoint, nextT) -
                               geometry::interpolateSpherical(startPoint, endPoint, prevT)).normalized();
 
-      QVector3D sideOffset = QVector3D::crossProduct(pathPoint, forwardDir).normalized() * (lineWidth * 0.5f);
+      QVector3D sideDir = QVector3D::crossProduct(pathPoint, forwardDir).normalized();
+      QVector3D sideOffset = sideDir * (lineWidth * 0.5f);
 
       float lift = 4.0f * progress * (1.0f - progress);
-      float baseOffset = 0.000f;
-      float radius = SphereRadius + baseOffset + lift * peakHeight;
+      float radius = constants::SphereRadius + lift * peakHeight;
 
-      QVector3D leftEdge = (pathPoint * radius) + sideOffset;
-      QVector3D rightEdge = (pathPoint * radius) - sideOffset;
+      QVector3D lateralShift = sideDir * (LateralOffset * lift);
+      QVector3D center = pathPoint * radius + lateralShift;
+      QVector3D leftEdge = center + sideOffset;
+      QVector3D rightEdge = center - sideOffset;
 
       *vertexWriter++ = leftEdge.x();  *vertexWriter++ = leftEdge.y();  *vertexWriter++ = leftEdge.z();
+      *vertexWriter++ = progress;      *vertexWriter++ = 0.0f;
       *vertexWriter++ = rightEdge.x(); *vertexWriter++ = rightEdge.y(); *vertexWriter++ = rightEdge.z();
+      *vertexWriter++ = progress;      *vertexWriter++ = 1.0f;
 
       for (const auto &v : {leftEdge, rightEdge}) {
           minBound = QVector3D(std::min(minBound.x(), v.x()),
@@ -87,5 +94,6 @@ void ArcGeometry::rebuild() {
    setBounds(minBound, maxBound);
    setPrimitiveType(PrimitiveType::TriangleStrip);
    addAttribute(Attribute::PositionSemantic, 0, Attribute::F32Type);
+   addAttribute(Attribute::TexCoord0Semantic, 3 * sizeof(float), Attribute::F32Type);
    update();
 }

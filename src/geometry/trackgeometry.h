@@ -8,6 +8,7 @@
 #include <QTimer>
 #include <limits>
 #include "utils.h"
+#include "constants.h"
 
 class TrackGeometry : public QQuick3DGeometry {
     Q_OBJECT
@@ -34,7 +35,6 @@ signals:
     void pointsChanged();
 
 private:
-    static constexpr float SphereRadius = 0.5f;
     static constexpr float BaseOffset = 0.001f;
     static constexpr float SubdivisionThreshold = 0.02f;
 
@@ -123,7 +123,7 @@ private:
         static constexpr float MinLineWidth  = 0.000001f;
         static constexpr float MaxLineWidth  = 0.0006f;
         float halfWidth = std::clamp(totalLength * WidthFraction, MinLineWidth, MaxLineWidth) * 0.5f;
-        float radius = SphereRadius + BaseOffset;
+        float radius = constants::SphereRadius + BaseOffset;
 
        // If we're on the order of a city
        if (geometry::arcLengthToMiles(totalLength) <= 15.0f) {

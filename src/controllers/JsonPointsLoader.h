@@ -11,9 +11,9 @@
 #include <QColor>
 #include <QtMath>
 #include "TrackController.h"
+#include "ArcController.h"
 #include "geometry/utils.h"
-
-static constexpr int DegreeDirectionChangeThreshold = 30;
+#include "constants.h"
 
 class JsonPointsLoader : public QObject {
     Q_OBJECT
@@ -83,9 +83,10 @@ private:
             QColor(0xdfe6e9), QColor(0xb2bec3), QColor(0xe17055), QColor(0x0984e3)
         };
         static constexpr int paletteSize = 16;
-        static constexpr float DirectionChangeThreshold = qDegreesToRadians(DegreeDirectionChangeThreshold);
+        static constexpr float DirectionChangeThreshold = qDegreesToRadians(static_cast<float>(constants::DirectionChangeDegrees));
 
         int trackCount = 0;
+        int arcCount = 0;
 
         for (const auto &group : dayGroups) {
             QColor color = palette[qHash(group.date) % paletteSize];
@@ -131,7 +132,7 @@ private:
                 }
             }
 
-            // Create a track for each strip
+            // Create a track or arc for each strip based on distance
             for (int s = 0; s < stripStarts.size(); ++s) {
                 int start = stripStarts[s];
                 int end = (s + 1 < stripStarts.size()) ? stripStarts[s + 1] : geoPoints.size() - 1;
@@ -139,22 +140,35 @@ private:
                 if (end - start < 1)
                     continue;
 
-                QVariantList trackPoints;
-                trackPoints.reserve(end - start + 1);
-                for (int i = start; i <= end; ++i) {
-                    QVariantMap pt;
-                    pt[QStringLiteral("latitude")] = geoPoints[i].lat;
-                    pt[QStringLiteral("longitude")] = geoPoints[i].lon;
-                    trackPoints.append(pt);
-                }
+                // Compute great-circle distance between strip endpoints
+                float dot = std::clamp(QVector3D::dotProduct(
+                    geoPoints[start].cart, geoPoints[end].cart), -1.0f, 1.0f);
+                float arcLength = std::acos(dot);
+                float miles = geometry::arcLengthToMiles(arcLength);
 
-                addTrack(m_engine, m_sceneRoot, trackPoints, color);
-                ++trackCount;
+                if (miles > constants::FlightDistanceMiles) {
+                    addArc(m_engine, m_sceneRoot,
+                           geoPoints[start].lat, geoPoints[start].lon,
+                           geoPoints[end].lat, geoPoints[end].lon, color);
+                    ++arcCount;
+                } else {
+                    QVariantList trackPoints;
+                    trackPoints.reserve(end - start + 1);
+                    for (int i = start; i <= end; ++i) {
+                        QVariantMap pt;
+                        pt[QStringLiteral("latitude")] = geoPoints[i].lat;
+                        pt[QStringLiteral("longitude")] = geoPoints[i].lon;
+                        trackPoints.append(pt);
+                    }
+                    addTrack(m_engine, m_sceneRoot, trackPoints, color);
+                    ++trackCount;
+                }
             }
         }
 
-        qDebug() << "JsonPointsLoader: created" << trackCount << "tracks from"
-                 << points.size() << "points across" << dayGroups.size() << "day groups";
+        qDebug() << "JsonPointsLoader: created" << trackCount << "tracks and"
+                 << arcCount << "arcs from" << points.size() << "points across"
+                 << dayGroups.size() << "day groups";
     }
 
     QQmlEngine *m_engine;
