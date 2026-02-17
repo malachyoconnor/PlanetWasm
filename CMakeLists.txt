@@ -37,6 +37,9 @@ qt_add_qml_module(PlanetWasm
         qml/components/PointImportPanel.qml
     RESOURCES
         assets/textures/earth.jpg
+        assets/examplePath1.json
+        assets/examplePath2.json
+        assets/examplePath3.json
     NO_RESOURCE_TARGET_PATH
 )
 

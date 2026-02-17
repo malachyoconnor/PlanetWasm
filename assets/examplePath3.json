@@ -1,0 +1,30 @@
+[
+  { "dateAsString": "20-Jan-2026", "latitude": 40.7128, "longitude": -74.0060 },
+  { "dateAsString": "20-Jan-2026", "latitude": 39.9526, "longitude": -75.1652 },
+  { "dateAsString": "20-Jan-2026", "latitude": 38.9072, "longitude": -77.0369 },
+
+  { "dateAsString": "21-Jan-2026", "latitude": 38.9072, "longitude": -77.0369 },
+  { "dateAsString": "21-Jan-2026", "latitude": 36.1627, "longitude": -86.7816 },
+  { "dateAsString": "21-Jan-2026", "latitude": 33.7490, "longitude": -84.3880 },
+
+  { "dateAsString": "22-Jan-2026", "latitude": 33.7490, "longitude": -84.3880 },
+  { "dateAsString": "22-Jan-2026", "latitude": 30.3322, "longitude": -81.6557 },
+  { "dateAsString": "22-Jan-2026", "latitude": 25.7617, "longitude": -80.1918 },
+
+  { "dateAsString": "23-Jan-2026", "latitude": 25.7617, "longitude": -80.1918 },
+  { "dateAsString": "23-Jan-2026", "latitude": 23.1136, "longitude": -82.3666 },
+  { "dateAsString": "23-Jan-2026", "latitude": 19.4326, "longitude": -99.1332 },
+
+  { "dateAsString": "24-Jan-2026", "latitude": 19.4326, "longitude": -99.1332 },
+  { "dateAsString": "24-Jan-2026", "latitude": 14.6349, "longitude": -90.5069 },
+  { "dateAsString": "24-Jan-2026", "latitude": 9.9281, "longitude": -84.0907 },
+
+  { "dateAsString": "25-Jan-2026", "latitude": 9.9281, "longitude": -84.0907 },
+  { "dateAsString": "25-Jan-2026", "latitude": 6.2442, "longitude": -75.5812 },
+  { "dateAsString": "25-Jan-2026", "latitude": 4.7110, "longitude": -74.0721 },
+
+  { "dateAsString": "26-Jan-2026", "latitude": 4.7110, "longitude": -74.0721 },
+  { "dateAsString": "26-Jan-2026", "latitude": -0.1807, "longitude": -78.4678 },
+  { "dateAsString": "26-Jan-2026", "latitude": -12.0464, "longitude": -77.0428 },
+  { "dateAsString": "26-Jan-2026", "latitude": -13.1631, "longitude": -72.5450 }
+]

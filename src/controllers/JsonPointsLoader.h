@@ -21,15 +21,28 @@ public:
     explicit JsonPointsLoader(QQmlEngine *engine, QObject *sceneRoot, QObject *parent = nullptr)
         : QObject(parent), m_engine(engine), m_sceneRoot(sceneRoot) {}
 
+    Q_INVOKABLE void loadResource(const QString &qrcPath) {
+        QFile file(qrcPath);
+        if (!file.open(QIODevice::ReadOnly)) {
+            qWarning() << "JsonPointsLoader: cannot open resource" << qrcPath;
+            return;
+        }
+        loadBytes(file.readAll());
+    }
+
     Q_INVOKABLE void loadFile(const QUrl &fileUrl) {
         QFile file(fileUrl.toLocalFile());
         if (!file.open(QIODevice::ReadOnly)) {
             qWarning() << "JsonPointsLoader: cannot open" << fileUrl;
             return;
         }
+        loadBytes(file.readAll());
+    }
 
+private:
+    void loadBytes(const QByteArray &data) {
         QJsonParseError err;
-        auto doc = QJsonDocument::fromJson(file.readAll(), &err);
+        auto doc = QJsonDocument::fromJson(data, &err);
         if (err.error != QJsonParseError::NoError) {
             qWarning() << "JsonPointsLoader: parse error:" << err.errorString();
             return;
@@ -144,7 +157,6 @@ public:
                  << points.size() << "points across" << dayGroups.size() << "day groups";
     }
 
-private:
     QQmlEngine *m_engine;
     QObject *m_sceneRoot;
 };
